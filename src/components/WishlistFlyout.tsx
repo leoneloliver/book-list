@@ -54,7 +54,7 @@ export const WishlistFlyout: React.FC<WishlistFlyoutProps> = ({
                   <img
                     src={
                       book.volumeInfo.imageLinks?.thumbnail ||
-                      '/placeholder-book.jpg'
+                      'https://placehold.co/400x600?text=No+Image'
                     }
                     alt={book.volumeInfo.title}
                     className="w-16 h-24 object-cover rounded cursor-pointer"

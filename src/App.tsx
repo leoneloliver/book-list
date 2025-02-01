@@ -11,6 +11,22 @@ import { ShoppingCart } from 'lucide-react';
 import Aside from './components/Aside';
 import BookCard from './components/BookCard';
 import Footer from './components/Footer';
+import { fetchBooks } from './api/books';
+
+// Add a utility function to handle scroll locking
+const useScrollLock = () => {
+  const lockScroll = () => {
+    // Save current scroll position
+    document.body.style.overflow = 'hidden';
+  };
+
+  const unlockScroll = () => {
+    // Restore scroll position
+    document.body.style.overflow = 'auto';
+  };
+
+  return { lockScroll, unlockScroll };
+};
 
 function App() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -28,6 +44,9 @@ function App() {
   const [totalItems, setTotalItems] = useState(0);
   const loadingRef = useRef<HTMLDivElement>(null);
 
+  // Add scroll lock hook
+  const { lockScroll, unlockScroll } = useScrollLock();
+
   useEffect(() => {
     const savedWishlist = localStorage.getItem('bookWishlist');
     if (savedWishlist) {
@@ -43,21 +62,61 @@ function App() {
   }, [searchQuery]);
 
   useEffect(() => {
+    const loadBooks = async () => {
+      try {
+        setLoading(true);
+        const result = await fetchBooks({
+          searchQuery: debouncedSearch,
+          selectedGenre,
+          startIndex: 0,
+        });
+
+        setBooks(result.books);
+        setTotalItems(result.totalItems);
+        setStartIndex(result.newStartIndex);
+        setHasMore(result.hasMore);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     setBooks([]);
     setStartIndex(0);
     setHasMore(true);
     setTotalItems(0);
-    fetchBooks();
+    loadBooks();
   }, [selectedGenre, debouncedSearch]);
 
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const target = entries[0];
       if (target.isIntersecting && !loading && hasMore) {
-        fetchBooks(true);
+        const loadMoreBooks = async () => {
+          try {
+            setLoading(true);
+            const result = await fetchBooks({
+              searchQuery: debouncedSearch,
+              selectedGenre,
+              startIndex,
+              loadMore: true
+            });
+
+            setBooks(prev => [...prev, ...result.books]);
+            setStartIndex(result.newStartIndex);
+            setHasMore(result.hasMore);
+          } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred');
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        loadMoreBooks();
       }
     },
-    [loading, hasMore]
+    [loading, hasMore, startIndex, debouncedSearch, selectedGenre]
   );
 
   useEffect(() => {
@@ -95,56 +154,24 @@ function App() {
     window.open(`https://www.amazon.com/s?k=${searchQuery}`, '_blank');
   };
 
-  const fetchBooks = async (loadMore = false) => {
-    try {
-      if (!hasMore && loadMore) return;
+  // Modal handlers with scroll lock
+  const handleOpenModal = (book: Book) => {
+    setSelectedBook(book);
+    lockScroll();
+  };
 
-      setLoading(true);
-      const searchTerm = debouncedSearch
-        ? `intitle:${debouncedSearch}${
-            selectedGenre !== 'All Genres'
-              ? `+subject:${selectedGenre.toLowerCase()}`
-              : ''
-          }`
-        : selectedGenre !== 'All Genres'
-        ? `subject:${selectedGenre.toLowerCase()}`
-        : '';
+  const handleCloseModal = () => {
+    setSelectedBook(null);
+    unlockScroll();
+  };
 
-      const response = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=${
-          searchTerm || '*'
-        }&maxResults=12&startIndex=${
-          loadMore ? startIndex : 0
-        }&orderBy=relevance`
-      );
-      if (!response.ok) throw new Error('Failed to fetch books');
+  // Wishlist flyout handlers with scroll lock
+  const handleOpenWishlist = () => {
+    setIsWishlistOpen(true);
+  };
 
-      const data = await response.json();
-
-      // Update total items count
-      if (!loadMore) {
-        setTotalItems(data.totalItems || 0);
-      }
-
-      const newItems = data.items || [];
-
-      if (loadMore) {
-        setBooks((prev) => [...prev, ...newItems]);
-        setStartIndex((prev) => prev + 12);
-      } else {
-        setBooks(newItems);
-        setStartIndex(12);
-      }
-
-      // Check if we've reached the end
-      const totalLoaded = loadMore ? books.length + newItems.length : newItems.length;
-      setHasMore(totalLoaded < data.totalItems);
-
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
+  const handleCloseWishlist = () => {
+    setIsWishlistOpen(false);
   };
 
   if (error) {
@@ -170,7 +197,7 @@ function App() {
         <main className="ml-64 flex-1 p-8">
           <header className="mb-8">
             <button
-              onClick={() => setIsWishlistOpen(true)}
+              onClick={handleOpenWishlist}
               className="flex items-center gap-2 ml-auto px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 absolute right-4"
             >
               <span>Wishlist</span>
@@ -208,7 +235,7 @@ function App() {
                     key={book.id}
                     book={book}
                     inWishlist={true}
-                    setSelectedBook={setSelectedBook}
+                    setSelectedBook={handleOpenModal}
                     toggleWishlist={toggleWishlist}
                     wishlist={wishlist}
                     buyNow={buyNow}
@@ -233,7 +260,7 @@ function App() {
                     key={book.id}
                     book={book}
                     inWishlist={false}
-                    setSelectedBook={setSelectedBook}
+                    setSelectedBook={handleOpenModal}
                     toggleWishlist={toggleWishlist}
                     wishlist={wishlist}
                     buyNow={buyNow}
@@ -241,7 +268,6 @@ function App() {
                 ))}
               </div>
 
-              {/* Infinite scroll loading indicator */}
               <div ref={loadingRef} className="mt-8 text-center">
                 {loading && hasMore && (
                   <div className="flex justify-center">
@@ -261,7 +287,7 @@ function App() {
         </main>
       </div>
 
-      <Dialog open={!!selectedBook} onOpenChange={() => setSelectedBook(null)}>
+      <Dialog open={!!selectedBook} onOpenChange={handleCloseModal}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>{selectedBook?.volumeInfo.title}</DialogTitle>
@@ -329,12 +355,12 @@ function App() {
 
       <WishlistFlyout
         isOpen={isWishlistOpen}
-        onClose={() => setIsWishlistOpen(false)}
+        onClose={handleCloseWishlist}
         wishlist={wishlist}
         toggleWishlist={toggleWishlist}
         onBookSelect={(book) => {
-          setSelectedBook(book);
-          setIsWishlistOpen(false);
+          handleOpenModal(book);
+          handleCloseWishlist();
         }}
       />
     </div>
