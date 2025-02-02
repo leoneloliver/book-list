@@ -11,7 +11,7 @@ const Footer = () => {
         <div className="border-t border-gray-300 mt-10 pt-8">
           <div className="flex flex-col md:flex-row justify-center items-center">
             <p className="text-gray-500 text-sm">
-              © {new Date().getFullYear()} Leonel Oliveira
+              © Leonel Oliveira {new Date().getFullYear()}
             </p>
 
           </div>

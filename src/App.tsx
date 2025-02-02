@@ -100,10 +100,10 @@ function App() {
               searchQuery: debouncedSearch,
               selectedGenre,
               startIndex,
-              loadMore: true
+              loadMore: true,
             });
 
-            setBooks(prev => [...prev, ...result.books]);
+            setBooks((prev) => [...prev, ...result.books]);
             setStartIndex(result.newStartIndex);
             setHasMore(result.hasMore);
           } catch (err) {
@@ -230,14 +230,14 @@ function App() {
           {showWishlist ? (
             wishlist.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-                {wishlist.map((book) => (
+                {wishlist.map((book, index) => (
                   <BookCard
-                    key={book.id}
+                    key={index}
                     book={book}
                     inWishlist={true}
+                    isBookmarked={true} // Always true in wishlist view
                     setSelectedBook={handleOpenModal}
                     toggleWishlist={toggleWishlist}
-                    wishlist={wishlist}
                     buyNow={buyNow}
                   />
                 ))}
@@ -255,14 +255,14 @@ function App() {
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-                {books.map((book) => (
+                {books.map((book, index) => (
                   <BookCard
-                    key={book.id}
+                    key={index}
                     book={book}
                     inWishlist={false}
+                    isBookmarked={wishlist.some((b) => b.id === book.id)}
                     setSelectedBook={handleOpenModal}
                     toggleWishlist={toggleWishlist}
-                    wishlist={wishlist}
                     buyNow={buyNow}
                   />
                 ))}

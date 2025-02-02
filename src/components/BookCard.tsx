@@ -5,18 +5,18 @@ import type { Book } from '../types/book';
 interface BookCardProps {
   book: Book;
   inWishlist?: boolean;
+  isBookmarked: boolean; // New prop replacing wishlist array
   setSelectedBook: (book: Book) => void;
   toggleWishlist: (book: Book) => void;
-  wishlist: Book[];
   buyNow: (title: string) => void;
 }
 
 const BookCard = ({
   book,
   inWishlist = false,
+  isBookmarked,
   setSelectedBook,
   toggleWishlist,
-  wishlist,
   buyNow,
 }: BookCardProps) => (
   <div
@@ -37,7 +37,10 @@ const BookCard = ({
     </div>
     <div className="p-4 flex flex-col flex-grow">
       <div className="flex-grow">
-        <h3 className="text-md font-semibold text-gray-900 mb-1 line-clamp-2 cursor-pointer" onClick={() => setSelectedBook(book)}>
+        <h3
+          className="text-md font-semibold text-gray-900 mb-1 line-clamp-2 cursor-pointer"
+          onClick={() => setSelectedBook(book)}
+        >
           {book.volumeInfo.title}
         </h3>
         <p className="text-sm text-gray-600 mb-2 italic line-clamp-2">
@@ -63,18 +66,10 @@ const BookCard = ({
             toggleWishlist(book);
           }}
           className={`ml-4 text-xl ${
-            wishlist.some((b) => b.id === book.id)
-              ? 'text-pink-600'
-              : 'text-gray-500 hover:text-pink-500'
+            isBookmarked ? 'text-pink-600' : 'text-gray-500 hover:text-pink-500'
           }`}
         >
-          {inWishlist ? (
-            <Trash2 size={16} />
-          ) : wishlist.some((b) => b.id === book.id) ? (
-            '♥'
-          ) : (
-            '♡'
-          )}
+          {inWishlist ? <Trash2 size={16} /> : isBookmarked ? '♥' : '♡'}
         </button>
         {inWishlist && (
           <button
