@@ -31,6 +31,7 @@ interface AsideProps {
   showWishlist: boolean;
   setShowWishlist: (show: boolean) => void;
   wishlistCount: number;
+  isSidebarOpen: boolean;
 }
 
 const Aside: FC<AsideProps> = ({
@@ -39,12 +40,16 @@ const Aside: FC<AsideProps> = ({
   setStartIndex,
   showWishlist,
   setShowWishlist,
-  wishlistCount
+  wishlistCount,
+  isSidebarOpen
 }) => {
   return (
-    <aside className="w-64 bg-white h-screen  fixed left-0 overflow-y-auto">
+    <aside className={`${
+      isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+    } lg:translate-x-0  z-20 w-64 bg-white shadow-lg lg:shadow-none
+    transition-transform duration-300 ease-in-out w-64 bg-white h-screen fixed left-0 overflow-y-auto`}>
       <div className="p-4">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Genres</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-4 lg:mt-4 mt-12">Genres</h2>
         <div className="space-y-2">
           {genres.map((genre) => (
             <button

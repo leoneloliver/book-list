@@ -44,6 +44,8 @@ function App() {
   const [totalItems, setTotalItems] = useState(0);
   const loadingRef = useRef<HTMLDivElement>(null);
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   // Add scroll lock hook
   const { lockScroll, unlockScroll } = useScrollLock();
 
@@ -184,7 +186,42 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+
+      {/* Add mobile menu button */}
+      <div className="fixed top-4 left-4 z-30 lg:hidden">
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="p-2 bg-white rounded-lg shadow-md hover:bg-gray-50"
+      >
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          {isSidebarOpen ? (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          ) : (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          )}
+        </svg>
+      </button>
+    </div>
+
       <div className="flex">
+
+
+
         <Aside
           selectedGenre={selectedGenre}
           setSelectedGenre={setSelectedGenre}
@@ -192,13 +229,24 @@ function App() {
           showWishlist={showWishlist}
           setShowWishlist={setShowWishlist}
           wishlistCount={wishlist.length}
+          isSidebarOpen={isSidebarOpen}
         />
 
-        <main className="ml-64 flex-1 p-8">
+
+
+        {/* Add overlay for mobile menu */}
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
+        <main className="w-full lg:ml-64 flex-1 p-8">
           <header className="mb-8">
             <button
               onClick={handleOpenWishlist}
-              className="flex items-center gap-2 ml-auto px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 absolute right-4"
+              className="flex items-center gap-2 ml-auto px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 absolute right-4 lg:-mt-0 -mt-16"
             >
               <span>Wishlist</span>
               <span className="bg-white text-pink-500 rounded-full w-6 h-6 flex items-center justify-center">
@@ -206,17 +254,17 @@ function App() {
               </span>
             </button>
 
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4 lg:mt-0 mt-12">
               {showWishlist ? 'My Wishlist' : 'Book Explorer'}
             </h1>
             {!showWishlist && (
-              <div className="flex items-center gap-4">
+              <div className="lg:flex block items-center gap-4">
                 <input
                   type="text"
                   placeholder="Search books by title..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full max-w-md px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full lg:max-w-md  max-w-full mb-4 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <span className="text-gray-600 text-sm">
                   Browsing{' '}
