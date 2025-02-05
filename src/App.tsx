@@ -268,8 +268,7 @@ function App() {
                 />
                 <span className="text-gray-600 text-sm">
                   Browsing{' '}
-                  <span className="font-semibold italic">{selectedGenre}</span>{' '}
-                  Books
+                  <span className="bg-pink-100 text-pink-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded-sm italic">{selectedGenre}</span>Books
                 </span>
               </div>
             )}
