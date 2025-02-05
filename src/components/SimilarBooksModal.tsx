@@ -36,7 +36,7 @@ const SimilarBooksModal: React.FC<SimilarBooksModalProps> = ({ isOpen, onClose, 
 
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full relative flex flex-col max-h-[80vh]">
         {/* Modal Header */}
         <div className="p-4 border-b flex items-center justify-between sticky top-0 bg-white z-10">
