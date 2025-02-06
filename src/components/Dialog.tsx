@@ -20,7 +20,7 @@ export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) 
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] flex flex-col shadow-lg">
         {/* Fixed Header with Close Button */}
         <div className="p-4 border-b flex justify-between items-center sticky top-0 bg-white z-10">
-          <DialogTitle>{' '}</DialogTitle>
+          <DialogTitle>Details</DialogTitle>
           <button
             onClick={() => onOpenChange(false)}
             className="text-gray-900 hover:text-gray-700"
