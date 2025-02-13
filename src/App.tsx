@@ -186,42 +186,38 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-
       {/* Add mobile menu button */}
       <div className="fixed top-4 left-4 z-30 lg:hidden">
-      <button
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="p-2 bg-white rounded-lg shadow-md hover:bg-gray-50"
-      >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="p-2 bg-white rounded-lg shadow-md hover:bg-gray-50"
         >
-          {isSidebarOpen ? (
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          ) : (
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          )}
-        </svg>
-      </button>
-    </div>
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            {isSidebarOpen ? (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            ) : (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            )}
+          </svg>
+        </button>
+      </div>
 
       <div className="flex">
-
-
-
         <Aside
           selectedGenre={selectedGenre}
           setSelectedGenre={setSelectedGenre}
@@ -231,8 +227,6 @@ function App() {
           wishlistCount={wishlist.length}
           isSidebarOpen={isSidebarOpen}
         />
-
-
 
         {/* Add overlay for mobile menu */}
         {isSidebarOpen && (
@@ -244,15 +238,17 @@ function App() {
 
         <main className="w-full lg:ml-64 flex-1 p-8">
           <header className="mb-8">
-            <button
-              onClick={handleOpenWishlist}
-              className="flex items-center gap-2 ml-auto px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 absolute right-4 lg:-mt-0 -mt-16"
-            >
-              <span>Wishlist</span>
-              <span className="bg-white text-pink-500 rounded-full w-6 h-6 flex items-center justify-center">
-                {wishlist.length}
-              </span>
-            </button>
+            {wishlist.length > 0 && (
+              <button
+                onClick={handleOpenWishlist}
+                className="flex items-center gap-2 ml-auto px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 absolute right-4 lg:-mt-0 -mt-16"
+              >
+                <span>Wishlist</span>
+                <span className="bg-white text-pink-500 rounded-full w-6 h-6 flex items-center justify-center">
+                  {wishlist.length}
+                </span>
+              </button>
+            )}
 
             <h1 className="text-2xl font-bold text-gray-900 mb-4 lg:mt-0 mt-12">
               {showWishlist ? 'My Wishlist' : 'Book Explorer'}
@@ -268,7 +264,10 @@ function App() {
                 />
                 <span className="text-gray-600 text-sm">
                   Browsing{' '}
-                  <span className="bg-pink-100 text-pink-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded-sm italic">{selectedGenre}</span>Books
+                  <span className="bg-pink-100 text-pink-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded-sm italic">
+                    {selectedGenre}
+                  </span>
+                  Books
                 </span>
               </div>
             )}
